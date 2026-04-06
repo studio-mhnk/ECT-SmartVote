@@ -1,0 +1,449 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ECT Postal Vote — Submit Ballot</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: system-ui, sans-serif;
+      background: #0f1117;
+      color: #e8e8e8;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+    }
+
+    .card {
+      background: #1a1d27;
+      border: 1px solid #2e3147;
+      border-radius: 16px;
+      padding: 40px;
+      width: 100%;
+      max-width: 520px;
+    }
+
+    .logo {
+      text-align: center;
+      margin-bottom: 28px;
+    }
+
+    .logo .title {
+      font-size: 22px;
+      font-weight: 600;
+      color: #ffffff;
+      letter-spacing: 0.02em;
+    }
+
+    .logo .subtitle {
+      font-size: 13px;
+      color: #7a7f99;
+      margin-top: 4px;
+    }
+
+    .divider {
+      border: none;
+      border-top: 1px solid #2e3147;
+      margin: 0 0 28px;
+    }
+
+    .notice {
+      background: #1e2235;
+      border: 1px solid #2e3147;
+      border-left: 3px solid #4f6ef7;
+      border-radius: 8px;
+      padding: 14px 16px;
+      font-size: 13px;
+      color: #9ba3c4;
+      line-height: 1.6;
+      margin-bottom: 28px;
+    }
+
+    .notice strong {
+      color: #c5caf0;
+    }
+
+    label.field-label {
+      display: block;
+      font-size: 13px;
+      font-weight: 500;
+      color: #9ba3c4;
+      margin-bottom: 10px;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+    }
+
+    .drop-zone {
+      border: 2px dashed #2e3147;
+      border-radius: 12px;
+      padding: 40px 24px;
+      text-align: center;
+      cursor: pointer;
+      transition: border-color 0.2s, background 0.2s;
+      position: relative;
+    }
+
+    .drop-zone:hover, .drop-zone.drag-over {
+      border-color: #4f6ef7;
+      background: #1e2235;
+    }
+
+    .drop-zone input[type="file"] {
+      position: absolute;
+      inset: 0;
+      opacity: 0;
+      cursor: pointer;
+      width: 100%;
+      height: 100%;
+    }
+
+    .drop-icon {
+      font-size: 36px;
+      margin-bottom: 12px;
+      opacity: 0.6;
+    }
+
+    .drop-text {
+      font-size: 15px;
+      color: #c5caf0;
+      font-weight: 500;
+    }
+
+    .drop-subtext {
+      font-size: 13px;
+      color: #5a6080;
+      margin-top: 6px;
+    }
+
+    /* Preview */
+    .preview-wrap {
+      margin-top: 20px;
+      display: none;
+    }
+
+    .preview-wrap.visible {
+      display: block;
+    }
+
+    .preview-label {
+      font-size: 12px;
+      color: #5a6080;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      margin-bottom: 8px;
+    }
+
+    .preview-img {
+      width: 100%;
+      border-radius: 8px;
+      border: 1px solid #2e3147;
+      display: block;
+    }
+
+    .file-info {
+      display: flex;
+      justify-content: space-between;
+      font-size: 12px;
+      color: #5a6080;
+      margin-top: 8px;
+    }
+
+    .btn-submit {
+      width: 100%;
+      margin-top: 24px;
+      padding: 14px;
+      background: #4f6ef7;
+      color: #ffffff;
+      font-size: 15px;
+      font-weight: 600;
+      border: none;
+      border-radius: 10px;
+      cursor: pointer;
+      transition: background 0.2s, opacity 0.2s;
+      letter-spacing: 0.02em;
+    }
+
+    .btn-submit:hover:not(:disabled) {
+      background: #3d5ce0;
+    }
+
+    .btn-submit:disabled {
+      opacity: 0.4;
+      cursor: not-allowed;
+    }
+
+    /* Progress */
+    .progress-wrap {
+      margin-top: 16px;
+      display: none;
+    }
+
+    .progress-wrap.visible {
+      display: block;
+    }
+
+    .progress-bar-bg {
+      background: #2e3147;
+      border-radius: 99px;
+      height: 6px;
+      overflow: hidden;
+    }
+
+    .progress-bar-fill {
+      height: 100%;
+      background: #4f6ef7;
+      border-radius: 99px;
+      width: 0%;
+      transition: width 0.2s;
+    }
+
+    .progress-text {
+      font-size: 12px;
+      color: #5a6080;
+      margin-top: 6px;
+      text-align: center;
+    }
+
+    /* Status messages */
+    .status {
+      margin-top: 20px;
+      padding: 14px 16px;
+      border-radius: 10px;
+      font-size: 14px;
+      line-height: 1.5;
+      display: none;
+    }
+
+    .status.visible { display: block; }
+
+    .status.success {
+      background: #162b1e;
+      border: 1px solid #1f4a2e;
+      color: #6fcf97;
+    }
+
+    .status.error {
+      background: #2b1616;
+      border: 1px solid #4a1f1f;
+      color: #eb5757;
+    }
+
+    .status .ref-code {
+      font-family: monospace;
+      font-size: 13px;
+      background: #0f1f16;
+      padding: 6px 10px;
+      border-radius: 6px;
+      display: inline-block;
+      margin-top: 8px;
+      letter-spacing: 0.05em;
+      color: #4fcf97;
+    }
+
+    .footer-note {
+      text-align: center;
+      font-size: 12px;
+      color: #3a3f58;
+      margin-top: 24px;
+      line-height: 1.6;
+    }
+  </style>
+</head>
+<body>
+
+<div class="card">
+  <div class="logo">
+    <div class="title">ECT Postal Voting</div>
+    <div class="subtitle">Official Ballot Submission Portal</div>
+  </div>
+
+  <hr class="divider" />
+
+  <div class="notice">
+    <strong>Your submission is anonymous.</strong><br>
+    No personal information is collected. Your image will have all metadata
+    (including device info, location, and timestamps) automatically removed
+    before it is stored.
+  </div>
+
+  <label class="field-label">Upload your completed ballot</label>
+
+  <div class="drop-zone" id="dropZone">
+    <input type="file" id="fileInput" accept="image/jpeg,image/png" />
+    <div class="drop-icon">🗳</div>
+    <div class="drop-text">Click to select or drag & drop</div>
+    <div class="drop-subtext">JPEG or PNG — ballot + declaration in one image</div>
+  </div>
+
+  <div class="preview-wrap" id="previewWrap">
+    <div class="preview-label">Preview — confirm this is your ballot</div>
+    <img class="preview-img" id="previewImg" src="" alt="Ballot preview" />
+    <div class="file-info">
+      <span id="fileName"></span>
+      <span id="fileSize"></span>
+    </div>
+  </div>
+
+  <button class="btn-submit" id="submitBtn" disabled>Submit Ballot</button>
+
+  <div class="progress-wrap" id="progressWrap">
+    <div class="progress-bar-bg">
+      <div class="progress-bar-fill" id="progressFill"></div>
+    </div>
+    <div class="progress-text" id="progressText">Uploading…</div>
+  </div>
+
+  <div class="status" id="statusMsg"></div>
+</div>
+
+<div class="footer-note">
+  ECT Electoral Commission &bull; Postal Voting System<br>
+  For assistance, contact your returning officer.
+</div>
+
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/12.11.0/firebase-app.js";
+  import { getStorage, ref, uploadBytesResumable } from "https://www.gstatic.com/firebasejs/12.11.0/firebase-storage.js";
+
+  const firebaseConfig = {
+    apiKey: "AIzaSyCc_sDCpf_2N8BbJLa-GLLdGaO97KnOkPs",
+    authDomain: "ect-postal-votes.firebaseapp.com",
+    databaseURL: "https://ect-postal-votes-default-rtdb.asia-southeast1.firebasedatabase.app",
+    projectId: "ect-postal-votes",
+    storageBucket: "ect-postal-votes.firebasestorage.app",
+    messagingSenderId: "882538370470",
+    appId: "1:882538370470:web:d4d22c0ddc38dd2f172b67"
+  };
+
+  const app = initializeApp(firebaseConfig);
+  const storage = getStorage(app);
+
+  // ── Helpers ──────────────────────────────────────────────────────────────
+
+  function generateUUID() {
+    return ([1e7]+-1e3+-4e3+-8e3+-1e11).replace(/[018]/g, c =>
+      (c ^ crypto.getRandomValues(new Uint8Array(1))[0] & 15 >> c / 4).toString(16)
+    );
+  }
+
+  function formatBytes(bytes) {
+    if (bytes < 1024) return bytes + ' B';
+    if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(1) + ' KB';
+    return (bytes / (1024 * 1024)).toFixed(2) + ' MB';
+  }
+
+  function showStatus(type, html) {
+    const el = document.getElementById('statusMsg');
+    el.className = `status visible ${type}`;
+    el.innerHTML = html;
+  }
+
+  // ── DOM refs ──────────────────────────────────────────────────────────────
+
+  const dropZone   = document.getElementById('dropZone');
+  const fileInput  = document.getElementById('fileInput');
+  const previewWrap = document.getElementById('previewWrap');
+  const previewImg = document.getElementById('previewImg');
+  const fileName   = document.getElementById('fileName');
+  const fileSize   = document.getElementById('fileSize');
+  const submitBtn  = document.getElementById('submitBtn');
+  const progressWrap = document.getElementById('progressWrap');
+  const progressFill = document.getElementById('progressFill');
+  const progressText = document.getElementById('progressText');
+
+  let selectedFile = null;
+
+  // ── Drag & drop visual ────────────────────────────────────────────────────
+
+  dropZone.addEventListener('dragover', e => { e.preventDefault(); dropZone.classList.add('drag-over'); });
+  dropZone.addEventListener('dragleave', () => dropZone.classList.remove('drag-over'));
+  dropZone.addEventListener('drop', e => {
+    e.preventDefault();
+    dropZone.classList.remove('drag-over');
+    const file = e.dataTransfer.files[0];
+    if (file) handleFile(file);
+  });
+
+  fileInput.addEventListener('change', () => {
+    if (fileInput.files[0]) handleFile(fileInput.files[0]);
+  });
+
+  // ── File selection ────────────────────────────────────────────────────────
+
+  function handleFile(file) {
+    const allowed = ['image/jpeg', 'image/png'];
+    if (!allowed.includes(file.type)) {
+      showStatus('error', 'Please upload a JPEG or PNG image only.');
+      return;
+    }
+    if (file.size > 20 * 1024 * 1024) {
+      showStatus('error', 'File is too large. Maximum size is 20 MB.');
+      return;
+    }
+
+    selectedFile = file;
+    fileName.textContent = file.name;
+    fileSize.textContent = formatBytes(file.size);
+
+    const reader = new FileReader();
+    reader.onload = e => {
+      previewImg.src = e.target.result;
+      previewWrap.classList.add('visible');
+    };
+    reader.readAsDataURL(file);
+
+    submitBtn.disabled = false;
+    document.getElementById('statusMsg').className = 'status';
+  }
+
+  // ── Upload ────────────────────────────────────────────────────────────────
+
+  submitBtn.addEventListener('click', () => {
+    if (!selectedFile) return;
+
+    const ext = selectedFile.type === 'image/png' ? 'png' : 'jpg';
+    const uuid = generateUUID();
+    const storagePath = `pending/${uuid}.${ext}`;
+
+    submitBtn.disabled = true;
+    progressWrap.classList.add('visible');
+    progressFill.style.width = '0%';
+    progressText.textContent = 'Uploading…';
+
+    const storageRef = ref(storage, storagePath);
+    const metadata = { contentType: selectedFile.type };
+    const uploadTask = uploadBytesResumable(storageRef, selectedFile, metadata);
+
+    uploadTask.on('state_changed',
+      snapshot => {
+        const pct = Math.round((snapshot.bytesTransferred / snapshot.totalBytes) * 100);
+        progressFill.style.width = pct + '%';
+        progressText.textContent = `Uploading… ${pct}%`;
+      },
+      error => {
+        progressWrap.classList.remove('visible');
+        submitBtn.disabled = false;
+        showStatus('error', `Upload failed: ${error.message}<br>Please try again or contact your returning officer.`);
+      },
+      () => {
+        progressFill.style.width = '100%';
+        progressText.textContent = 'Complete';
+        showStatus('success', `
+          Your ballot has been submitted successfully.<br>
+          <span class="ref-code">REF: ${uuid.split('-')[0].toUpperCase()}</span><br><br>
+          You may note your reference code, but it is not required.<br>
+          Your submission is anonymous and cannot be traced back to you.
+        `);
+        submitBtn.textContent = 'Submitted ✓';
+        fileInput.disabled = true;
+      }
+    );
+  });
+</script>
+</body>
+</html>
