@@ -18,7 +18,6 @@
       padding: 24px;
     }
 
-    /* ── Auth screen ─────────────────────────────────────────── */
     #auth-screen {
       display: flex;
       flex-direction: column;
@@ -38,18 +37,8 @@
       text-align: center;
     }
 
-    .auth-card h1 {
-      font-size: 20px;
-      font-weight: 600;
-      color: #fff;
-      margin-bottom: 6px;
-    }
-
-    .auth-card p {
-      font-size: 13px;
-      color: #5a6080;
-      margin-bottom: 28px;
-    }
+    .auth-card h1 { font-size: 20px; font-weight: 600; color: #fff; margin-bottom: 6px; }
+    .auth-card p  { font-size: 13px; color: #5a6080; margin-bottom: 28px; }
 
     .auth-card input {
       width: 100%;
@@ -66,15 +55,9 @@
     }
 
     .auth-card input:focus { border-color: #4f6ef7; }
+    .auth-error   { font-size: 13px; color: #eb5757; margin-bottom: 12px; display: none; }
+    .auth-loading { font-size: 13px; color: #5a6080; margin-bottom: 12px; display: none; }
 
-    .auth-error {
-      font-size: 13px;
-      color: #eb5757;
-      margin-bottom: 12px;
-      display: none;
-    }
-
-    /* ── Main interface ──────────────────────────────────────── */
     #main-screen { display: none; width: 100%; max-width: 900px; }
 
     .top-bar {
@@ -87,16 +70,9 @@
       gap: 12px;
     }
 
-    .top-bar h1 {
-      font-size: 18px;
-      font-weight: 600;
-      color: #fff;
-    }
+    .top-bar h1 { font-size: 18px; font-weight: 600; color: #fff; }
 
-    .stats {
-      display: flex;
-      gap: 10px;
-    }
+    .stats { display: flex; gap: 10px; }
 
     .stat {
       background: #1a1d27;
@@ -107,16 +83,10 @@
       color: #9ba3c4;
     }
 
-    .stat span {
-      font-weight: 600;
-      color: #fff;
-      margin-left: 4px;
-    }
+    .stat span             { font-weight: 600; color: #fff; margin-left: 4px; }
+    .stat.accepted span    { color: #6fcf97; }
+    .stat.denied span      { color: #eb5757; }
 
-    .stat.accepted span { color: #6fcf97; }
-    .stat.denied span { color: #eb5757; }
-
-    /* ── Ballot card ─────────────────────────────────────────── */
     .ballot-card {
       background: #1a1d27;
       border: 1px solid #2e3147;
@@ -133,19 +103,8 @@
       margin-bottom: 16px;
     }
 
-    .ballot-id {
-      font-size: 12px;
-      color: #3a3f58;
-      font-family: monospace;
-      letter-spacing: 0.05em;
-    }
-
-    .ballot-label {
-      font-size: 12px;
-      color: #5a6080;
-      text-transform: uppercase;
-      letter-spacing: 0.06em;
-    }
+    .ballot-id    { font-size: 12px; color: #3a3f58; font-family: monospace; letter-spacing: 0.05em; }
+    .ballot-label { font-size: 12px; color: #5a6080; text-transform: uppercase; letter-spacing: 0.06em; }
 
     .declaration-wrap {
       width: 100%;
@@ -160,20 +119,10 @@
       min-height: 200px;
     }
 
-    .declaration-wrap canvas {
-      max-width: 100%;
-      display: block;
-    }
+    .declaration-wrap canvas { max-width: 100%; display: block; }
+    .loading-text { color: #3a3f58; font-size: 14px; }
 
-    .loading-text {
-      color: #3a3f58;
-      font-size: 14px;
-    }
-
-    .btn-row {
-      display: flex;
-      gap: 12px;
-    }
+    .btn-row { display: flex; gap: 12px; }
 
     .btn {
       flex: 1;
@@ -189,39 +138,17 @@
 
     .btn:disabled { opacity: 0.4; cursor: not-allowed; }
 
-    .btn-accept {
-      background: #1a3d2b;
-      color: #6fcf97;
-      border: 1px solid #1f4a2e;
-    }
-
+    .btn-accept { background: #1a3d2b; color: #6fcf97; border: 1px solid #1f4a2e; }
     .btn-accept:hover:not(:disabled) { background: #1f4a35; }
 
-    .btn-deny {
-      background: #3d1a1a;
-      color: #eb5757;
-      border: 1px solid #4a1f1f;
-    }
-
+    .btn-deny { background: #3d1a1a; color: #eb5757; border: 1px solid #4a1f1f; }
     .btn-deny:hover:not(:disabled) { background: #4a2020; }
 
-    .btn-processing {
-      opacity: 0.5;
-      cursor: not-allowed !important;
-    }
-
-    /* ── Empty / done states ─────────────────────────────────── */
-    .empty-state {
-      text-align: center;
-      padding: 80px 20px;
-      color: #3a3f58;
-    }
-
+    .empty-state { text-align: center; padding: 80px 20px; color: #3a3f58; }
     .empty-state .icon { font-size: 48px; margin-bottom: 16px; }
     .empty-state h2 { font-size: 18px; color: #5a6080; margin-bottom: 8px; }
-    .empty-state p { font-size: 14px; }
+    .empty-state p  { font-size: 14px; }
 
-    /* ── Buttons shared ──────────────────────────────────────── */
     .btn-primary {
       width: 100%;
       padding: 13px;
@@ -259,18 +186,17 @@
 </head>
 <body>
 
-<!-- ── Auth screen ───────────────────────────────────────────────────────── -->
 <div id="auth-screen">
   <div class="auth-card">
     <h1>Declaration Review</h1>
     <p>ECT Electoral Commission — Authorised staff only</p>
     <input type="password" id="passInput" placeholder="Enter passphrase" />
-    <div class="auth-error" id="authError">Incorrect passphrase. Try again.</div>
-    <button class="btn-primary" onclick="checkPass()">Enter</button>
+    <div class="auth-error"   id="authError">Incorrect passphrase. Try again.</div>
+    <div class="auth-loading" id="authLoading">Verifying…</div>
+    <button class="btn-primary" id="enterBtn" onclick="checkPass()">Enter</button>
   </div>
 </div>
 
-<!-- ── Main screen ───────────────────────────────────────────────────────── -->
 <div id="main-screen">
   <div class="top-bar">
     <h1>Declaration Review</h1>
@@ -280,20 +206,20 @@
       <div class="stat denied">Denied <span id="statDenied">0</span></div>
     </div>
   </div>
-
   <div id="ballotList"></div>
 </div>
 
 <div class="toast" id="toast"></div>
 
 <script type="module">
-  import { initializeApp } from "https://www.gstatic.com/firebasejs/12.11.0/firebase-app.js";
-  import {
-    getStorage, ref, listAll, getDownloadURL, getMetadata
-  } from "https://www.gstatic.com/firebasejs/12.11.0/firebase-storage.js";
-  import {
-    getFunctions, httpsCallable
-  } from "https://www.gstatic.com/firebasejs/12.11.0/firebase-functions.js";
+  import { initializeApp }
+    from "https://www.gstatic.com/firebasejs/12.11.0/firebase-app.js";
+  import { getStorage, ref, listAll, getDownloadURL, getMetadata }
+    from "https://www.gstatic.com/firebasejs/12.11.0/firebase-storage.js";
+  import { getFunctions, httpsCallable }
+    from "https://www.gstatic.com/firebasejs/12.11.0/firebase-functions.js";
+  import { getRemoteConfig, fetchAndActivate, getValue }
+    from "https://www.gstatic.com/firebasejs/12.11.0/firebase-remote-config.js";
 
   const firebaseConfig = {
     apiKey: "AIzaSyCc_sDCpf_2N8BbJLa-GLLdGaO97KnOkPs",
@@ -305,24 +231,48 @@
     appId: "1:882538370470:web:d4d22c0ddc38dd2f172b67"
   };
 
-  const app = initializeApp(firebaseConfig);
-  const storage = getStorage(app);
-  const functions = getFunctions(app, "us-east1");
+  const app          = initializeApp(firebaseConfig);
+  const storage      = getStorage(app);
+  const functions    = getFunctions(app, "us-east1");
+  const remoteConfig = getRemoteConfig(app);
 
-  // ── Passphrase ────────────────────────────────────────────────────────────
-  // Change this to your chosen passphrase
-  const PASSPHRASE = "ECT-REVIEW-2025";
+  remoteConfig.settings.minimumFetchIntervalMillis = 3600000;
+  remoteConfig.defaultConfig = { review_passphrase: "" };
 
+  let passphrase = "";
   let stats = { pending: 0, accepted: 0, denied: 0 };
 
-  window.checkPass = function() {
-    const val = document.getElementById('passInput').value.trim();
-    if (val === PASSPHRASE) {
+  // Fetch passphrase in background as soon as page loads
+  const remoteConfigReady = (async () => {
+    try {
+      await fetchAndActivate(remoteConfig);
+      passphrase = getValue(remoteConfig, "review_passphrase").asString();
+    } catch (err) {
+      console.error("Remote Config fetch failed:", err);
+    }
+  })();
+
+  // ── Auth ──────────────────────────────────────────────────────────────────
+  window.checkPass = async function() {
+    const input      = document.getElementById('passInput').value.trim();
+    const enterBtn   = document.getElementById('enterBtn');
+    const authLoading = document.getElementById('authLoading');
+    const authError  = document.getElementById('authError');
+
+    enterBtn.disabled = true;
+    authLoading.style.display = 'block';
+    authError.style.display   = 'none';
+
+    await remoteConfigReady;
+
+    if (input === passphrase && passphrase !== "") {
       document.getElementById('auth-screen').style.display = 'none';
       document.getElementById('main-screen').style.display = 'block';
       loadPendingBallots();
     } else {
-      document.getElementById('authError').style.display = 'block';
+      authError.style.display   = 'block';
+      authLoading.style.display = 'none';
+      enterBtn.disabled = false;
       document.getElementById('passInput').value = '';
     }
   };
@@ -334,9 +284,8 @@
   // ── Load pending ballots ──────────────────────────────────────────────────
   async function loadPendingBallots() {
     const listRef = ref(storage, 'pending/');
-    const list = await listAll(listRef);
+    const list    = await listAll(listRef);
 
-    // Filter to only scrubbed files (exifScrubbed = true)
     const scrubbed = [];
     for (const item of list.items) {
       try {
@@ -370,7 +319,7 @@
     }
   }
 
-  // ── Render a single ballot card ───────────────────────────────────────────
+  // ── Render ballot card (right half only) ──────────────────────────────────
   function renderBallotCard(filename, url, container) {
     const shortId = filename.replace('pending/', '').split('.')[0].split('-')[0].toUpperCase();
 
@@ -386,34 +335,25 @@
         <span class="loading-text">Loading…</span>
       </div>
       <div class="btn-row">
-        <button class="btn btn-accept" id="accept-${shortId}" onclick="handleDecision('${filename}', '${shortId}', 'accept')">
-          ✓ Accept
-        </button>
-        <button class="btn btn-deny" id="deny-${shortId}" onclick="handleDecision('${filename}', '${shortId}', 'deny')">
-          ✗ Deny
-        </button>
+        <button class="btn btn-accept" id="accept-${shortId}"
+          onclick="handleDecision('${filename}', '${shortId}', 'accept')">✓ Accept</button>
+        <button class="btn btn-deny"   id="deny-${shortId}"
+          onclick="handleDecision('${filename}', '${shortId}', 'deny')">✗ Deny</button>
       </div>
     `;
     container.appendChild(card);
 
-    // Load image and crop to right half only
     const img = new Image();
     img.crossOrigin = 'anonymous';
     img.onload = () => {
-      const wrap = document.getElementById(`wrap-${shortId}`);
+      const wrap  = document.getElementById(`wrap-${shortId}`);
       wrap.innerHTML = '';
-
       const halfW = Math.floor(img.naturalWidth / 2);
-      const h = img.naturalHeight;
-
+      const h     = img.naturalHeight;
       const canvas = document.createElement('canvas');
-      canvas.width = halfW;
+      canvas.width  = halfW;
       canvas.height = h;
-
-      const ctx = canvas.getContext('2d');
-      // Draw only the RIGHT half (x = halfW onwards)
-      ctx.drawImage(img, halfW, 0, halfW, h, 0, 0, halfW, h);
-
+      canvas.getContext('2d').drawImage(img, halfW, 0, halfW, h, 0, 0, halfW, h);
       wrap.appendChild(canvas);
     };
     img.onerror = () => {
@@ -423,78 +363,57 @@
     img.src = url;
   }
 
-  // ── Handle accept / deny decision ────────────────────────────────────────
+  // ── Accept / Deny ─────────────────────────────────────────────────────────
   window.handleDecision = async function(filename, shortId, decision) {
     const acceptBtn = document.getElementById(`accept-${shortId}`);
-    const denyBtn = document.getElementById(`deny-${shortId}`);
+    const denyBtn   = document.getElementById(`deny-${shortId}`);
 
-    acceptBtn.disabled = true;
-    denyBtn.disabled = true;
-    acceptBtn.classList.add('btn-processing');
-    denyBtn.classList.add('btn-processing');
-
-    if (decision === 'accept') {
-      acceptBtn.textContent = 'Processing…';
-    } else {
-      denyBtn.textContent = 'Processing…';
-    }
+    acceptBtn.disabled = denyBtn.disabled = true;
+    if (decision === 'accept') acceptBtn.textContent = 'Processing…';
+    else                       denyBtn.textContent   = 'Processing…';
 
     try {
       const processBallot = httpsCallable(functions, 'processBallot');
       await processBallot({ filename, decision });
 
-      // Update stats
       stats.pending = Math.max(0, stats.pending - 1);
-      if (decision === 'accept') {
-        stats.accepted++;
-        showToast(`✓ Ballot ${shortId} accepted`);
-      } else {
-        stats.denied++;
-        showToast(`✗ Ballot ${shortId} denied`);
-      }
+      if (decision === 'accept') { stats.accepted++; showToast(`✓ Ballot ${shortId} accepted`); }
+      else                       { stats.denied++;   showToast(`✗ Ballot ${shortId} denied`);   }
       updateStats();
 
-      // Remove card with fade
-      const card = document.getElementById(`card-${filename.replace('pending/', '').replace('.', '-')}`);
+      const card = document.getElementById(
+        `card-${filename.replace('pending/', '').replace('.', '-')}`
+      );
       card.style.transition = 'opacity 0.4s';
       card.style.opacity = '0';
-      setTimeout(() => card.remove(), 400);
-
-      // Show empty state if nothing left
-      if (stats.pending === 0) {
-        setTimeout(() => {
-          const listEl = document.getElementById('ballotList');
-          if (listEl.children.length === 0) {
-            listEl.innerHTML = `
-              <div class="empty-state">
-                <div class="icon">✓</div>
-                <h2>All done</h2>
-                <p>All pending declarations have been reviewed.</p>
-              </div>`;
-          }
-        }, 500);
-      }
+      setTimeout(() => {
+        card.remove();
+        if (stats.pending === 0 && document.getElementById('ballotList').children.length === 0) {
+          document.getElementById('ballotList').innerHTML = `
+            <div class="empty-state">
+              <div class="icon">✓</div>
+              <h2>All done</h2>
+              <p>All pending declarations have been reviewed.</p>
+            </div>`;
+        }
+      }, 400);
 
     } catch (err) {
       console.error('Decision failed:', err);
-      acceptBtn.disabled = false;
-      denyBtn.disabled = false;
-      acceptBtn.classList.remove('btn-processing');
-      denyBtn.classList.remove('btn-processing');
+      acceptBtn.disabled = denyBtn.disabled = false;
       acceptBtn.textContent = '✓ Accept';
-      denyBtn.textContent = '✗ Deny';
+      denyBtn.textContent   = '✗ Deny';
       showToast('Error processing ballot. Try again.');
     }
   };
 
-  // ── Stats ─────────────────────────────────────────────────────────────────
+  // ── Helpers ───────────────────────────────────────────────────────────────
   function updateStats() {
-    document.getElementById('statPending').textContent = stats.pending;
+    document.getElementById('statPending').textContent  = stats.pending;
     document.getElementById('statAccepted').textContent = stats.accepted;
-    document.getElementById('statDenied').textContent = stats.denied;
+    document.getElementById('statDenied').textContent   = stats.denied;
   }
 
-  // ── Toast ─────────────────────────────────────────────────────────────────
   function showToast(msg) {
     const t = document.getElementById('toast');
     t.textContent = msg;
