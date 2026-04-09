@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="th">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>ECT Postal Vote — Submit Ballot</title>
+  <title>ECT SmartVote</title>
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
@@ -258,52 +258,50 @@
 
 <div class="card">
   <div class="logo">
-    <div class="title">ECT Postal Voting</div>
-    <div class="subtitle">Official Ballot Submission Portal</div>
+    <div class="title">ECT SmartVote</div>
+    <div class="subtitle">ส่งคืนเอกสารออกเสียงลงคะแนนทางไปรษณีย์</div>
   </div>
 
   <hr class="divider" />
 
   <div class="notice">
-    <strong>Your submission is anonymous.</strong><br>
-    No personal information is collected. Your image will have all metadata
-    (including device info, location, and timestamps) automatically removed
-    before it is stored.
+    <strong>เรารักษาความลับในการออกเสียงลงคะแนน</strong><br>
+    ระบบจะไม่เก็บข้อมูลส่วนตัวของท่าน และข้อมูล Metadata ในไฟล์ที่ท่านส่งจะถูกลบโดยอัตโนมัติก่อนที่เจ้าพนักงานนับคะแนนจะสามารถดูได้
   </div>
 
-  <label class="field-label">Upload your completed ballot</label>
+  <label class="field-label">ส่งบัตรเลือกตั้งและใบรับรอง</label>
 
   <div class="drop-zone" id="dropZone">
     <input type="file" id="fileInput" accept="image/jpeg,image/png" />
     <div class="drop-icon">🗳</div>
-    <div class="drop-text">Click to select or drag & drop</div>
-    <div class="drop-subtext">JPEG or PNG — ballot + declaration in one image</div>
+    <div class="drop-text">กดที่นี่เพื่อเลือกไฟล์ หรือนำไฟล์เลื่อนลงใส่ที่นี่</div>
+    <div class="drop-subtext">ให้ส่งเฉพาะไฟล์ JPEG หรือ PNG เท่านั้น ห้ามแยกบัตรเลือกตั้งและใบรับรองออกจากกันโดยเด็ดขาด</div>
   </div>
 
   <div class="preview-wrap" id="previewWrap">
-    <div class="preview-label">Preview — confirm this is your ballot</div>
-    <img class="preview-img" id="previewImg" src="" alt="Ballot preview" />
+    <div class="preview-label">นี่คือบัตรเลือกตั้งและใบรับรองที่ท่านจะส่งใช่ไหม?</div>
+    <img class="preview-img" id="previewImg" src="" alt="ตัวอย่างภาพที่ท่านจะส่ง" />
     <div class="file-info">
       <span id="fileName"></span>
       <span id="fileSize"></span>
     </div>
   </div>
 
-  <button class="btn-submit" id="submitBtn" disabled>Submit Ballot</button>
+  <button class="btn-submit" id="submitBtn" disabled>ส่งเอกสาร</button>
 
   <div class="progress-wrap" id="progressWrap">
     <div class="progress-bar-bg">
       <div class="progress-bar-fill" id="progressFill"></div>
     </div>
-    <div class="progress-text" id="progressText">Uploading…</div>
+    <div class="progress-text" id="progressText">กำลังส่ง...</div>
   </div>
 
   <div class="status" id="statusMsg"></div>
 </div>
 
 <div class="footer-note">
-  ECT Electoral Commission &bull; Postal Voting System<br>
-  For assistance, contact your returning officer.
+  ใช้ในการจำลองเหตุการณ์เท่านั้น<br>
+  หากต้องการความช่วยเหลือ ให้ติดต่อทาง Discord
 </div>
 
 <script type="module">
@@ -378,11 +376,11 @@
   function handleFile(file) {
     const allowed = ['image/jpeg', 'image/png'];
     if (!allowed.includes(file.type)) {
-      showStatus('error', 'Please upload a JPEG or PNG image only.');
+      showStatus('error', 'ให้ส่งเฉพาะไฟล์ JPEG หรือ PNG เท่านั้น');
       return;
     }
     if (file.size > 20 * 1024 * 1024) {
-      showStatus('error', 'File is too large. Maximum size is 20 MB.');
+      showStatus('error', 'ไฟล์มีขนาดใหญ่เกิน กรุณาส่งไฟล์ไม่เกิน 20 MB');
       return;
     }
 
@@ -413,7 +411,7 @@
     submitBtn.disabled = true;
     progressWrap.classList.add('visible');
     progressFill.style.width = '0%';
-    progressText.textContent = 'Uploading…';
+    progressText.textContent = 'กำลังส่ง...';
 
     const storageRef = ref(storage, storagePath);
     const metadata = { contentType: selectedFile.type };
@@ -423,23 +421,23 @@
       snapshot => {
         const pct = Math.round((snapshot.bytesTransferred / snapshot.totalBytes) * 100);
         progressFill.style.width = pct + '%';
-        progressText.textContent = `Uploading… ${pct}%`;
+        progressText.textContent = `กำลังส่ง... ${pct}%`;
       },
       error => {
         progressWrap.classList.remove('visible');
         submitBtn.disabled = false;
-        showStatus('error', `Upload failed: ${error.message}<br>Please try again or contact your returning officer.`);
+        showStatus('error', `ไม่สามารถส่งไฟล์ได้: ${error.message}<br>กรุณาลองอีกครั้งหรือติดต่อเจ้าพนักงานเพื่อรับความช่วยเหลือ`);
       },
       () => {
         progressFill.style.width = '100%';
-        progressText.textContent = 'Complete';
+        progressText.textContent = 'ส่งเรียบร้อยแล้ว!';
         showStatus('success', `
-          Your ballot has been submitted successfully.<br>
-          <span class="ref-code">REF: ${uuid.split('-')[0].toUpperCase()}</span><br><br>
-          You may note your reference code, but it is not required.<br>
-          Your submission is anonymous and cannot be traced back to you.
+          บัตรเลือกตั้งและใบรับรองของท่าน ส่งเรียบร้อยแล้ว<br>
+          <span class="ref-code">รหัสอ้างอิง: ${uuid.split('-')[0].toUpperCase()}</span><br><br>
+          ท่านสามารถบันทึกรหัสอ้างอิงนี้ไว้ได้หากเห็นสมควร แต่ไม่จำเป็นต้องเก็บไว้ก็ได้<br>
+          การส่งเอกสารออกเสียงลงคะแนนทางไปรษณีย์ของท่านจะไม่สามารถเชื่อมโยงกลับมาถึงตัวท่านได้
         `);
-        submitBtn.textContent = 'Submitted ✓';
+        submitBtn.textContent = 'เสร็จสิ้น ✓';
         fileInput.disabled = true;
       }
     );
