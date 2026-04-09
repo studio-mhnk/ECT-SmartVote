@@ -87,9 +87,9 @@
       color: #9ba3c4;
     }
 
-    .stat span             { font-weight: 600; color: #fff; margin-left: 4px; }
-    .stat.accepted span    { color: #6fcf97; }
-    .stat.denied span      { color: #eb5757; }
+    .stat span          { font-weight: 600; color: #fff; margin-left: 4px; }
+    .stat.accepted span { color: #6fcf97; }
+    .stat.denied span   { color: #eb5757; }
 
     .ballot-card {
       background: #1a1d27;
@@ -130,12 +130,11 @@
       width: 200%;
       max-width: none;
       top: 0;
-      pointer-events: none;   /* blocks drag */
+      pointer-events: none;
       -webkit-user-drag: none;
       user-drag: none;
     }
 
-    /* Transparent overlay — sits on top of image, blocks right-click on the img itself */
     .declaration-wrap::after {
       content: '';
       position: absolute;
@@ -275,10 +274,9 @@
     }
   })();
 
-  // ── Block right-click, Save As, and common download shortcuts ────────────
+  // ── Block right-click and download shortcuts ──────────────────────────────
   document.addEventListener('contextmenu', e => e.preventDefault());
   document.addEventListener('keydown', e => {
-    // Block Cmd+S / Ctrl+S (Save), Cmd+Shift+S, Cmd+P (Print)
     if ((e.metaKey || e.ctrlKey) && ['s', 'p'].includes(e.key.toLowerCase())) {
       e.preventDefault();
     }
@@ -345,10 +343,11 @@
       return;
     }
 
-   for (const item of scrubbed) {
-  const url = await getDownloadURL(item);
-  renderBallotCard(item.fullPath, url, listEl);
-}
+    for (const item of scrubbed) {
+      const url = await getDownloadURL(item);
+      renderBallotCard(item.fullPath, url, listEl);
+    }
+  }  // ← end of loadPendingBallots
 
   // ── Render ballot card (right half only via CSS) ──────────────────────────
   function renderBallotCard(filename, url, container) {
@@ -375,17 +374,17 @@
     container.appendChild(card);
 
     const wrap = document.getElementById(`wrap-${shortId}`);
-    const img = new Image();
+    const img  = new Image();
     img.onload = () => {
-      wrap.innerHTML = '';
-      img.draggable = false;
+      wrap.innerHTML  = '';
+      img.draggable   = false;
       wrap.appendChild(img);
     };
     img.onerror = () => {
       wrap.innerHTML = '<span class="loading-text">Failed to load image.</span>';
     };
     img.src = url;
-  }
+  }  // ← end of renderBallotCard
 
   // ── Accept / Deny ─────────────────────────────────────────────────────────
   window.handleDecision = async function(filename, shortId, decision) {
@@ -409,7 +408,7 @@
         `card-${filename.replace('pending/', '').replace('.', '-')}`
       );
       card.style.transition = 'opacity 0.4s';
-      card.style.opacity = '0';
+      card.style.opacity    = '0';
       setTimeout(() => {
         card.remove();
         if (stats.pending === 0 && document.getElementById('ballotList').children.length === 0) {
@@ -429,7 +428,7 @@
       denyBtn.textContent   = '✗ Deny';
       showToast('Error processing ballot. Try again.');
     }
-  };
+  };  // ← end of handleDecision
 
   // ── Helpers ───────────────────────────────────────────────────────────────
   function updateStats() {
@@ -444,6 +443,7 @@
     t.classList.add('show');
     setTimeout(() => t.classList.remove('show'), 2500);
   }
+
 </script>
 </body>
 </html>
