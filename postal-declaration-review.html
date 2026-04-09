@@ -345,11 +345,10 @@
       return;
     }
 
-    for (const item of scrubbed) {
-      const url = await getDownloadURL(item);
-      renderBallotCard(item.name, url, listEl);
-    }
-  }
+   for (const item of scrubbed) {
+  const url = await getDownloadURL(item);
+  renderBallotCard(item.fullPath, url, listEl);
+}
 
   // ── Render ballot card (right half only via CSS) ──────────────────────────
   function renderBallotCard(filename, url, container) {
