@@ -1,0 +1,482 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ECT Postal Vote — Ballot Count</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: system-ui, sans-serif;
+      background: #0f1117;
+      color: #e8e8e8;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 24px;
+      -webkit-user-select: none;
+      user-select: none;
+    }
+
+    /* ── Auth ────────────────────────────────────────────────── */
+    #auth-screen {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      width: 100%;
+    }
+
+    .auth-card {
+      background: #1a1d27;
+      border: 1px solid #2e3147;
+      border-radius: 16px;
+      padding: 40px;
+      width: 100%;
+      max-width: 400px;
+      text-align: center;
+    }
+
+    .auth-card h1 { font-size: 20px; font-weight: 600; color: #fff; margin-bottom: 6px; }
+    .auth-card p  { font-size: 13px; color: #5a6080; margin-bottom: 28px; }
+
+    .auth-card input {
+      width: 100%;
+      padding: 12px 16px;
+      background: #0f1117;
+      border: 1px solid #2e3147;
+      border-radius: 10px;
+      color: #e8e8e8;
+      font-size: 15px;
+      text-align: center;
+      letter-spacing: 0.1em;
+      margin-bottom: 14px;
+      outline: none;
+      -webkit-user-select: text;
+      user-select: text;
+    }
+
+    .auth-card input:focus { border-color: #4f6ef7; }
+    .auth-error   { font-size: 13px; color: #eb5757; margin-bottom: 12px; display: none; }
+    .auth-loading { font-size: 13px; color: #5a6080; margin-bottom: 12px; display: none; }
+
+    .btn-primary {
+      width: 100%;
+      padding: 13px;
+      background: #4f6ef7;
+      color: #fff;
+      font-size: 15px;
+      font-weight: 600;
+      border: none;
+      border-radius: 10px;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+
+    .btn-primary:hover { background: #3d5ce0; }
+
+    /* ── Main ────────────────────────────────────────────────── */
+    #main-screen { display: none; width: 100%; max-width: 1200px; }
+
+    .top-bar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      width: 100%;
+      margin-bottom: 24px;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+
+    .top-bar h1 { font-size: 18px; font-weight: 600; color: #fff; }
+
+    .ballot-count {
+      background: #1a1d27;
+      border: 1px solid #2e3147;
+      border-radius: 8px;
+      padding: 6px 14px;
+      font-size: 13px;
+      color: #9ba3c4;
+    }
+
+    .ballot-count span { font-weight: 600; color: #6fcf97; margin-left: 4px; }
+
+    /* ── Grid ────────────────────────────────────────────────── */
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+      gap: 16px;
+      width: 100%;
+    }
+
+    .grid-item {
+      background: #1a1d27;
+      border: 1px solid #2e3147;
+      border-radius: 12px;
+      overflow: hidden;
+      cursor: pointer;
+      transition: border-color 0.2s, transform 0.15s;
+    }
+
+    .grid-item:hover {
+      border-color: #4f6ef7;
+      transform: translateY(-2px);
+    }
+
+    .grid-img-wrap {
+      width: 100%;
+      aspect-ratio: 1 / 1.75;
+      overflow: hidden;
+      background: #0f1117;
+      position: relative;
+    }
+
+    .grid-img-wrap img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      object-position: center top;
+      display: block;
+      pointer-events: none;
+      -webkit-user-drag: none;
+    }
+
+    .grid-item-footer {
+      padding: 8px 12px;
+      font-size: 11px;
+      color: #3a3f58;
+      font-family: monospace;
+      letter-spacing: 0.04em;
+      border-top: 1px solid #2e3147;
+    }
+
+    /* ── Lightbox ────────────────────────────────────────────── */
+    #lightbox {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.85);
+      z-index: 100;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+    }
+
+    #lightbox.open { display: flex; }
+
+    .lightbox-inner {
+      position: relative;
+      max-width: 700px;
+      width: 100%;
+      max-height: 90vh;
+      overflow-y: auto;
+      border-radius: 12px;
+    }
+
+    .lightbox-inner img {
+      width: 100%;
+      display: block;
+      border-radius: 12px;
+      pointer-events: none;
+      -webkit-user-drag: none;
+    }
+
+    .lightbox-close {
+      position: fixed;
+      top: 20px;
+      right: 24px;
+      background: #1a1d27;
+      border: 1px solid #2e3147;
+      color: #e8e8e8;
+      font-size: 20px;
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: background 0.2s;
+      z-index: 101;
+    }
+
+    .lightbox-close:hover { background: #2e3147; }
+
+    .lightbox-nav {
+      position: fixed;
+      top: 50%;
+      transform: translateY(-50%);
+      background: #1a1d27;
+      border: 1px solid #2e3147;
+      color: #e8e8e8;
+      font-size: 20px;
+      width: 44px;
+      height: 44px;
+      border-radius: 50%;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: background 0.2s;
+      z-index: 101;
+    }
+
+    .lightbox-nav:hover { background: #2e3147; }
+    .lightbox-nav.prev { left: 16px; }
+    .lightbox-nav.next { right: 16px; }
+    .lightbox-nav:disabled { opacity: 0.2; cursor: default; }
+
+    .lightbox-counter {
+      position: fixed;
+      bottom: 20px;
+      left: 50%;
+      transform: translateX(-50%);
+      font-size: 13px;
+      color: #5a6080;
+      background: #1a1d27;
+      border: 1px solid #2e3147;
+      border-radius: 8px;
+      padding: 6px 14px;
+    }
+
+    /* ── Empty state ─────────────────────────────────────────── */
+    .empty-state { text-align: center; padding: 80px 20px; color: #3a3f58; width: 100%; }
+    .empty-state .icon { font-size: 48px; margin-bottom: 16px; }
+    .empty-state h2 { font-size: 18px; color: #5a6080; margin-bottom: 8px; }
+    .empty-state p  { font-size: 14px; }
+
+    /* ── Loading skeleton ────────────────────────────────────── */
+    .skeleton {
+      background: linear-gradient(90deg, #1a1d27 25%, #222538 50%, #1a1d27 75%);
+      background-size: 200% 100%;
+      animation: shimmer 1.4s infinite;
+      border-radius: 12px;
+      aspect-ratio: 1 / 1.75;
+    }
+
+    @keyframes shimmer {
+      0%   { background-position: 200% 0; }
+      100% { background-position: -200% 0; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- ── Auth ──────────────────────────────────────────────────────────────── -->
+<div id="auth-screen">
+  <div class="auth-card">
+    <h1>Ballot Count</h1>
+    <p>ECT Electoral Commission — Authorised staff only</p>
+    <input type="password" id="passInput" placeholder="Enter passphrase" />
+    <div class="auth-error"   id="authError">Incorrect passphrase. Try again.</div>
+    <div class="auth-loading" id="authLoading">Verifying…</div>
+    <button class="btn-primary" id="enterBtn" onclick="checkPass()">Enter</button>
+  </div>
+</div>
+
+<!-- ── Main ──────────────────────────────────────────────────────────────── -->
+<div id="main-screen">
+  <div class="top-bar">
+    <h1>Accepted Ballots</h1>
+    <div class="ballot-count">Total <span id="totalCount">0</span></div>
+  </div>
+  <div class="grid" id="grid"></div>
+</div>
+
+<!-- ── Lightbox ──────────────────────────────────────────────────────────── -->
+<div id="lightbox">
+  <button class="lightbox-close" onclick="closeLightbox()">✕</button>
+  <button class="lightbox-nav prev" id="prevBtn" onclick="navigateLightbox(-1)">‹</button>
+  <div class="lightbox-inner">
+    <img id="lightboxImg" src="" alt="Ballot" />
+  </div>
+  <button class="lightbox-nav next" id="nextBtn" onclick="navigateLightbox(1)">›</button>
+  <div class="lightbox-counter" id="lightboxCounter"></div>
+</div>
+
+<script type="module">
+  import { initializeApp }
+    from "https://www.gstatic.com/firebasejs/12.11.0/firebase-app.js";
+  import { getStorage, ref, listAll, getDownloadURL }
+    from "https://www.gstatic.com/firebasejs/12.11.0/firebase-storage.js";
+  import { getRemoteConfig, fetchAndActivate, getValue }
+    from "https://www.gstatic.com/firebasejs/12.11.0/firebase-remote-config.js";
+
+  const firebaseConfig = {
+    apiKey: "AIzaSyCc_sDCpf_2N8BbJLa-GLLdGaO97KnOkPs",
+    authDomain: "ect-postal-votes.firebaseapp.com",
+    databaseURL: "https://ect-postal-votes-default-rtdb.asia-southeast1.firebasedatabase.app",
+    projectId: "ect-postal-votes",
+    storageBucket: "ect-postal-votes.firebasestorage.app",
+    messagingSenderId: "882538370470",
+    appId: "1:882538370470:web:d4d22c0ddc38dd2f172b67"
+  };
+
+  const app          = initializeApp(firebaseConfig);
+  const storage      = getStorage(app);
+  const remoteConfig = getRemoteConfig(app);
+
+  remoteConfig.settings.minimumFetchIntervalMillis = 3600000;
+  remoteConfig.defaultConfig = { count_passphrase: "" };
+
+  let passphrase = "";
+  let ballotURLs = [];
+  let lightboxIndex = 0;
+
+  const remoteConfigReady = (async () => {
+    try {
+      await fetchAndActivate(remoteConfig);
+      passphrase = getValue(remoteConfig, "count_passphrase").asString();
+    } catch (err) {
+      console.error("Remote Config fetch failed:", err);
+    }
+  })();
+
+  // ── Block right-click and download shortcuts ──────────────────────────────
+  document.addEventListener('contextmenu', e => e.preventDefault());
+  document.addEventListener('keydown', e => {
+    if ((e.metaKey || e.ctrlKey) && ['s', 'p'].includes(e.key.toLowerCase())) {
+      e.preventDefault();
+    }
+    if (e.key === 'Escape')      closeLightbox();
+    if (e.key === 'ArrowLeft')   navigateLightbox(-1);
+    if (e.key === 'ArrowRight')  navigateLightbox(1);
+  });
+
+  // ── Auth ──────────────────────────────────────────────────────────────────
+  window.checkPass = async function() {
+    const input       = document.getElementById('passInput').value.trim();
+    const enterBtn    = document.getElementById('enterBtn');
+    const authLoading = document.getElementById('authLoading');
+    const authError   = document.getElementById('authError');
+
+    enterBtn.disabled = true;
+    authLoading.style.display = 'block';
+    authError.style.display   = 'none';
+
+    await remoteConfigReady;
+
+    if (input === passphrase && passphrase !== "") {
+      document.getElementById('auth-screen').style.display = 'none';
+      document.getElementById('main-screen').style.display = 'block';
+      loadBallots();
+    } else {
+      authError.style.display   = 'block';
+      authLoading.style.display = 'none';
+      enterBtn.disabled = false;
+      document.getElementById('passInput').value = '';
+    }
+  };
+
+  document.getElementById('passInput').addEventListener('keydown', e => {
+    if (e.key === 'Enter') window.checkPass();
+  });
+
+  // ── Load accepted ballots ─────────────────────────────────────────────────
+  async function loadBallots() {
+    const grid    = document.getElementById('grid');
+    const listRef = ref(storage, 'accepted/ballots/');
+
+    let items;
+    try {
+      const list = await listAll(listRef);
+      items = list.items;
+    } catch (err) {
+      grid.innerHTML = `
+        <div class="empty-state">
+          <div class="icon">⚠️</div>
+          <h2>Could not load ballots</h2>
+          <p>${err.message}</p>
+        </div>`;
+      return;
+    }
+
+    if (items.length === 0) {
+      grid.innerHTML = `
+        <div class="empty-state">
+          <div class="icon">🗳</div>
+          <h2>No accepted ballots yet</h2>
+          <p>Ballots will appear here once declarations have been reviewed and accepted.</p>
+        </div>`;
+      return;
+    }
+
+    document.getElementById('totalCount').textContent = items.length;
+
+    // Show skeletons while loading
+    for (let i = 0; i < items.length; i++) {
+      const skeleton = document.createElement('div');
+      skeleton.className = 'skeleton';
+      skeleton.id = `skeleton-${i}`;
+      grid.appendChild(skeleton);
+    }
+
+    // Load each ballot and replace skeleton
+    for (let i = 0; i < items.length; i++) {
+      const item = items[i];
+      try {
+        const url = await getDownloadURL(item);
+        ballotURLs.push(url);
+        const idx = ballotURLs.length - 1;
+
+        const gridItem = document.createElement('div');
+        gridItem.className = 'grid-item';
+        gridItem.onclick = () => openLightbox(idx);
+
+        const shortId = item.name.split('-')[0].toUpperCase();
+
+        gridItem.innerHTML = `
+          <div class="grid-img-wrap">
+            <img src="${url}" alt="Ballot ${shortId}" loading="lazy" />
+          </div>
+          <div class="grid-item-footer">${shortId}</div>
+        `;
+
+        const skeleton = document.getElementById(`skeleton-${i}`);
+        grid.replaceChild(gridItem, skeleton);
+
+      } catch (err) {
+        console.warn('Failed to load ballot:', item.name, err);
+        const skeleton = document.getElementById(`skeleton-${i}`);
+        if (skeleton) skeleton.remove();
+      }
+    }
+  }
+
+  // ── Lightbox ──────────────────────────────────────────────────────────────
+  window.openLightbox = function(idx) {
+    lightboxIndex = idx;
+    updateLightbox();
+    document.getElementById('lightbox').classList.add('open');
+  };
+
+  window.closeLightbox = function() {
+    document.getElementById('lightbox').classList.remove('open');
+  };
+
+  window.navigateLightbox = function(dir) {
+    const next = lightboxIndex + dir;
+    if (next < 0 || next >= ballotURLs.length) return;
+    lightboxIndex = next;
+    updateLightbox();
+  };
+
+  function updateLightbox() {
+    document.getElementById('lightboxImg').src = ballotURLs[lightboxIndex];
+    document.getElementById('lightboxCounter').textContent =
+      `${lightboxIndex + 1} of ${ballotURLs.length}`;
+    document.getElementById('prevBtn').disabled = lightboxIndex === 0;
+    document.getElementById('nextBtn').disabled = lightboxIndex === ballotURLs.length - 1;
+  }
+
+  // Close lightbox on backdrop click
+  document.getElementById('lightbox').addEventListener('click', function(e) {
+    if (e.target === this) closeLightbox();
+  });
+
+</script>
+</body>
+</html>
