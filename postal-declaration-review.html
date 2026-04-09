@@ -16,6 +16,8 @@
       flex-direction: column;
       align-items: center;
       padding: 24px;
+      -webkit-user-select: none;
+      user-select: none;
     }
 
     #auth-screen {
@@ -52,6 +54,8 @@
       letter-spacing: 0.1em;
       margin-bottom: 14px;
       outline: none;
+      -webkit-user-select: text;
+      user-select: text;
     }
 
     .auth-card input:focus { border-color: #4f6ef7; }
@@ -110,7 +114,7 @@
       position: relative;
       overflow: hidden;
       width: 100%;
-      aspect-ratio: 1 / 1.75; /* 800x1400 — right half of 1600x1400 */
+      aspect-ratio: 1 / 1.75;
       background: #0f1117;
       border: 1px solid #2e3147;
       border-radius: 10px;
@@ -126,6 +130,18 @@
       width: 200%;
       max-width: none;
       top: 0;
+      pointer-events: none;   /* blocks drag */
+      -webkit-user-drag: none;
+      user-drag: none;
+    }
+
+    /* Transparent overlay — sits on top of image, blocks right-click on the img itself */
+    .declaration-wrap::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      z-index: 10;
+      cursor: default;
     }
 
     .loading-text { color: #3a3f58; font-size: 14px; }
@@ -259,6 +275,15 @@
     }
   })();
 
+  // ── Block right-click, Save As, and common download shortcuts ────────────
+  document.addEventListener('contextmenu', e => e.preventDefault());
+  document.addEventListener('keydown', e => {
+    // Block Cmd+S / Ctrl+S (Save), Cmd+Shift+S, Cmd+P (Print)
+    if ((e.metaKey || e.ctrlKey) && ['s', 'p'].includes(e.key.toLowerCase())) {
+      e.preventDefault();
+    }
+  });
+
   // ── Auth ──────────────────────────────────────────────────────────────────
   window.checkPass = async function() {
     const input       = document.getElementById('passInput').value.trim();
@@ -326,7 +351,7 @@
     }
   }
 
-  // ── Render ballot card (right half only via CSS) ───────────────────────────
+  // ── Render ballot card (right half only via CSS) ──────────────────────────
   function renderBallotCard(filename, url, container) {
     const shortId = filename.replace('pending/', '').split('.')[0].split('-')[0].toUpperCase();
 
@@ -344,7 +369,7 @@
       <div class="btn-row">
         <button class="btn btn-accept" id="accept-${shortId}"
           onclick="handleDecision('${filename}', '${shortId}', 'accept')">✓ Accept</button>
-        <button class="btn btn-deny"   id="deny-${shortId}"
+        <button class="btn btn-deny" id="deny-${shortId}"
           onclick="handleDecision('${filename}', '${shortId}', 'deny')">✗ Deny</button>
       </div>
     `;
@@ -354,6 +379,7 @@
     const img = new Image();
     img.onload = () => {
       wrap.innerHTML = '';
+      img.draggable = false;
       wrap.appendChild(img);
     };
     img.onerror = () => {
