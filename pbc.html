@@ -319,7 +319,7 @@
   const storage      = getStorage(app);
   const remoteConfig = getRemoteConfig(app);
 
-  remoteConfig.settings.minimumFetchIntervalMillis = 3600000;
+  remoteConfig.settings.minimumFetchIntervalMillis = 0;
   remoteConfig.defaultConfig = { count_passphrase: "" };
 
   let passphrase = "";
