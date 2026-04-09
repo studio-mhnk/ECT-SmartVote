@@ -107,19 +107,27 @@
     .ballot-label { font-size: 12px; color: #5a6080; text-transform: uppercase; letter-spacing: 0.06em; }
 
     .declaration-wrap {
+      position: relative;
+      overflow: hidden;
       width: 100%;
+      aspect-ratio: 1 / 1.75; /* 800x1400 — right half of 1600x1400 */
       background: #0f1117;
       border: 1px solid #2e3147;
       border-radius: 10px;
-      overflow: hidden;
       margin-bottom: 20px;
       display: flex;
       align-items: center;
       justify-content: center;
-      min-height: 200px;
     }
 
-    .declaration-wrap canvas { max-width: 100%; display: block; }
+    .declaration-wrap img {
+      position: absolute;
+      left: -100%;
+      width: 200%;
+      max-width: none;
+      top: 0;
+    }
+
     .loading-text { color: #3a3f58; font-size: 14px; }
 
     .btn-row { display: flex; gap: 12px; }
@@ -242,7 +250,6 @@
   let passphrase = "";
   let stats = { pending: 0, accepted: 0, denied: 0 };
 
-  // Fetch passphrase in background as soon as page loads
   const remoteConfigReady = (async () => {
     try {
       await fetchAndActivate(remoteConfig);
@@ -254,10 +261,10 @@
 
   // ── Auth ──────────────────────────────────────────────────────────────────
   window.checkPass = async function() {
-    const input      = document.getElementById('passInput').value.trim();
-    const enterBtn   = document.getElementById('enterBtn');
+    const input       = document.getElementById('passInput').value.trim();
+    const enterBtn    = document.getElementById('enterBtn');
     const authLoading = document.getElementById('authLoading');
-    const authError  = document.getElementById('authError');
+    const authError   = document.getElementById('authError');
 
     enterBtn.disabled = true;
     authLoading.style.display = 'block';
@@ -319,7 +326,7 @@
     }
   }
 
-  // ── Render ballot card (right half only) ──────────────────────────────────
+  // ── Render ballot card (right half only via CSS) ───────────────────────────
   function renderBallotCard(filename, url, container) {
     const shortId = filename.replace('pending/', '').split('.')[0].split('-')[0].toUpperCase();
 
@@ -343,22 +350,14 @@
     `;
     container.appendChild(card);
 
+    const wrap = document.getElementById(`wrap-${shortId}`);
     const img = new Image();
-    img.crossOrigin = 'anonymous';
     img.onload = () => {
-      const wrap  = document.getElementById(`wrap-${shortId}`);
       wrap.innerHTML = '';
-      const halfW = Math.floor(img.naturalWidth / 2);
-      const h     = img.naturalHeight;
-      const canvas = document.createElement('canvas');
-      canvas.width  = halfW;
-      canvas.height = h;
-      canvas.getContext('2d').drawImage(img, halfW, 0, halfW, h, 0, 0, halfW, h);
-      wrap.appendChild(canvas);
+      wrap.appendChild(img);
     };
     img.onerror = () => {
-      document.getElementById(`wrap-${shortId}`).innerHTML =
-        '<span class="loading-text">Failed to load image.</span>';
+      wrap.innerHTML = '<span class="loading-text">Failed to load image.</span>';
     };
     img.src = url;
   }
